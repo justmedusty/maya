@@ -19,6 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 pub mod arg_handling {
     const ERROR : i32 = 1;
     const SUCCESS : i32 = 0;
+
+    use std::fs::File;
     use std::process::exit;
     use crate::file_encoding_support;
     use crate::file_encoding_support::file_encoding_support::{FileEncoding, FileEncodingMethod, FileEncodingSupport, ImageSupport, Operation};
@@ -97,6 +99,19 @@ pub mod arg_handling {
         if(operation == Operation::Embed) {
             message = args[4].as_bytes().to_vec();
         }
+
+        let file_no = match operation {
+            Operation::Embed   => 5,
+            Operation::Extract => 4
+        };
+
+        let file : File = match File::open(args[file_no].as_str()) {
+            Ok(x) => x,
+            Err(_) => {
+                println!("File not found!");
+                exit(1);
+            },
+        };
 
 
 
