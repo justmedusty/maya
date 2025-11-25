@@ -24,7 +24,8 @@ pub mod arg_handling {
     use std::process::exit;
     use crate::file_encoding_support;
     use crate::file_encoding_support::file_encoding_support::{FileEncoding, FileEncodingMethod, FileEncodingSupport, ImageSupport, Operation};
-
+    use crate::filetype_support::bmp::BmpImageParser;
+    use crate::filetype_support::filetype_support::FileType::Bmp;
 
     pub fn parse_arguments<T: file_encoding_support::file_encoding_support::FileEncodingAlgorithms + file_encoding_support::file_encoding_support::FileEncodingSupport>(args: Vec<String>) -> ImageSupport<T> {
         if ( args.len() <= 2 && args[1] == "--help") {
@@ -100,18 +101,20 @@ pub mod arg_handling {
             message = args[4].as_bytes().to_vec();
         }
 
+        /*
+            position is different depending on if the operation is embed (embed has the message extra)
+         */
         let file_no = match operation {
             Operation::Embed   => 5,
             Operation::Extract => 4
         };
 
-        let file : File = match File::open(args[file_no].as_str()) {
-            Ok(x) => x,
-            Err(_) => {
-                println!("File not found!");
-                exit(1);
-            },
-        };
+
+        let file_ext = args[file_no].as_str().split_at(".".parse().unwrap()).1;
+
+        if(file_ext == "bmp"){
+            //return BmpImageParser::new(args[file_no].as_str());
+        }
 
 
 
