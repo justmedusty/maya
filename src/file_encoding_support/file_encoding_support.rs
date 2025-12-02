@@ -18,14 +18,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 
 use std::fs::File;
 
-pub struct ImageSupport<T: FileEncodingSupport> {
+pub struct ImageSupport {
     pub(crate) image_file: File,
     pub(crate) encoding: FileEncoding,
     pub(crate) encoding_method: FileEncodingMethod,
     pub(crate) file_encoding_function_derivation: FileEncodingFunctionDerivation,
     pub(crate) operation: Operation,
     pub(crate) data : Vec<u8>,
-    pub(crate) encoding_support: T,
+    pub(crate) encoding_support: Box<dyn FileEncodingSupport>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -68,7 +68,7 @@ pub enum FileEncodingFunctionDerivation {
 }
 
 pub trait FileEncodingSupport {
-    fn new(filename : &str) -> Self;
+    fn new(filename : &str) -> Self where Self: Sized;
 
     fn parse_file(&mut self);
 
