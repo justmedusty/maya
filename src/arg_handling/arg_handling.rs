@@ -28,14 +28,14 @@ pub mod arg_handling {
     use crate::filetype_support::filetype_support::FileType::Bmp;
 
     pub fn parse_arguments(args: Vec<String>) -> ImageSupport {
-        if ( args.len() <= 2 && args[1] == "--help") {
+        if args.len() == 2 && args[1] == "--help" {
             println!("Usage: maya encoding(Lsb,PixelValueDifferencing,Hamming) encoding-method(LeftRight, TopBottom, SinWave,CosWave, PolyFunc, FractalFunc) operation(embed/extract) <optional>'Message to be hidden'</optional> filename.ext(either the file to extract or the filename to embed into)");
             println!("This is a stegonagraphy tool for embedding and extracting secret messages within images.");
             println!("Options: --help, --version");
             exit(SUCCESS);
         }
 
-        if (args.len() <= 2 && args[1] == "--version") {
+        if (args.len() == 2 && args[1] == "--version") {
             println!("Maya version {}", env!("CARGO_PKG_VERSION"));
             exit(SUCCESS);
         }
