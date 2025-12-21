@@ -108,3 +108,55 @@ pub fn reserved_set(ChunkType(type_): ChunkType) -> bool {
 pub fn safe_to_copy(ChunkType(type_): ChunkType) -> bool {
     type_[3] & 32 != 0
 }
+
+#[derive(Debug)]
+pub struct IHDRData {
+    pub width: u32,
+    pub height: u32,
+    pub bit_depth: u8,
+    pub color_type: u8,
+    pub compression_method: u8,
+    pub filter_method: u8,
+    pub interlace_method: u8,
+}
+
+fn parse_ihdr(data: &[u8]) -> IHDRData {
+    IHDRData {
+        width: u32::from_be_bytes([data[0], data[1], data[2], data[3]]),
+        height: u32::from_be_bytes([data[4], data[5], data[6], data[7]]),
+        bit_depth: data[8],
+        color_type: data[9],
+        compression_method: data[10],
+        filter_method: data[11],
+        interlace_method: data[12],
+    }
+}
+
+fn read_chunk<R: Read>(reader: &mut R) -> io::Result<(ChunkType, Vec<u8>)> {
+    // Read chunk length (4 bytes)
+    let mut length_bytes = [0u8; 4];
+    reader.read_exact(&mut length_bytes)?;
+    let length = u32::from_be_bytes(length_bytes) as usize;
+
+    // Read chunk type (4 bytes)
+    let mut type_bytes = [0u8; 4];
+    reader.read_exact(&mut type_bytes)?;
+    let chunk_type = ChunkType(type_bytes);
+
+    // Read chunk data (length bytes)
+    let mut data = vec![0u8; length];
+    reader.read_exact(&mut data)?;
+
+    // Read CRC32 (4 bytes)
+    let mut crc_bytes = [0u8; 4];
+    reader.read_exact(&mut crc_bytes)?;
+
+    // Validate CRC32 (checksum of the chunk type)
+    let crc = crc32::checksum_ieee(&chunk_type.0);
+    let expected_crc = u32::from_be_bytes(crc_bytes);
+    if crc != expected_crc {
+        return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid CRC"));
+    }
+
+    Ok((chunk_type, data))
+}
