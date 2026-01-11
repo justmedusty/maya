@@ -131,7 +131,7 @@ fn parse_ihdr(data: &[u8]) -> IHDRData {
         interlace_method: data[12],
     }
 }
-
+/*
 fn read_chunk<R: Read>(reader: &mut R) -> io::Result<(ChunkType, Vec<u8>)> {
     // Read chunk length (4 bytes)
     let mut length_bytes = [0u8; 4];
@@ -160,3 +160,6 @@ fn read_chunk<R: Read>(reader: &mut R) -> io::Result<(ChunkType, Vec<u8>)> {
 
     Ok((chunk_type, data))
 }
+
+
+ */
